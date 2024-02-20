@@ -1,0 +1,82 @@
+/*IDS vs BFS
+IDS successively processes the nodes at incremental depths, whereas BFS conducts the search level by level.
+ Also, BFS visits each node once, whereas IDS visits some nodes multiple times.*/
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+// Define the node structure
+struct Node {
+    int data;
+    vector<Node*> children;
+
+    Node(int value) : data(value) {}
+};
+
+bool depthLimitedSearch(Node* node, int goal, int depthLimit) {
+    if (node == nullptr) {
+        return false;
+    }
+
+    if (node->data == goal) {
+        return true;  // Goal found
+    }
+
+    if (depthLimit <= 0) {
+        return false;  // Depth limit reached
+    }
+
+    for (Node* child : node->children) {
+        if (depthLimitedSearch(child, goal, depthLimit - 1)) {
+            return true;  // Goal found in child
+        }
+    }
+
+    return false;
+}
+
+bool iterativeDeepeningSearch(Node* root, int goal) {
+    int depthLimit = 0;
+
+    while (true) {
+        if (depthLimitedSearch(root, goal, depthLimit)) {
+            return true;  // Goal found
+        }
+        depthLimit++;
+    }
+
+    return false;  // Unreachable code, added to satisfy compiler
+}
+
+// Example usage:
+int main() {
+    // Create a sample tree
+    Node* root = new Node(1);
+    root->children.push_back(new Node(2));
+    root->children.push_back(new Node(3));
+    root->children[0]->children.push_back(new Node(4));
+    root->children[0]->children.push_back(new Node(5));
+    root->children[1]->children.push_back(new Node(6));
+
+    // Set the goal
+    int goalValue = 5;
+
+    // Perform iterative deepening search
+    if (iterativeDeepeningSearch(root, goalValue)) {
+        cout << "Goal found." << endl;
+    } else {
+        cout << "Goal not found." << endl;
+    }
+
+    // Cleanup: Free allocated memory (not necessary in all cases)
+    // TODO: Implement a proper destructor to handle cleanup
+    delete root->children[0]->children[0];
+    delete root->children[0]->children[1];
+    delete root->children[1]->children[0];
+    delete root->children[0];
+    delete root->children[1];
+    delete root;
+
+    return 0;
+}
