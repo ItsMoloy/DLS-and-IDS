@@ -1,0 +1,71 @@
+/*DFS vs DLS
+The depth-limited search (DLS) method is almost equal to depth-first search (DFS), but DLS can work on the infinite state space problem.
+Because it bounds the depth of the search tree with a predetermined limit L.
+ Nodes at this depth limit are treated as if they had no successors.*/
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+// Define the node structure
+struct Node {
+    int data;
+    vector<Node*> children;
+
+    Node(int value) : data(value) {}
+};
+
+bool depthLimitedSearch(Node* node, int goal, int depthLimit) {
+    if (node == nullptr) {
+        return false;
+    }
+
+    if (node->data == goal) {
+        return true;  // Goal found
+    }
+
+    if (depthLimit <= 0) {
+        return false;  // Depth limit reached
+    }
+
+    for (Node* child : node->children) {
+        if (depthLimitedSearch(child, goal, depthLimit - 1)) {
+            return true;  // Goal found in child
+        }
+    }
+
+    return false;
+}
+
+// Example usage:
+int main() {
+    // Create a sample tree
+    Node* root = new Node(1);
+    root->children.push_back(new Node(2));
+    root->children.push_back(new Node(3));
+    root->children[0]->children.push_back(new Node(4));
+    root->children[0]->children.push_back(new Node(5));
+    root->children[1]->children.push_back(new Node(6));
+
+    // Set the goal and depth limit
+    int goalValue = 5;
+    int depthLimit = 2;
+
+    // Perform depth-limited search
+    if (depthLimitedSearch(root, goalValue, depthLimit)) {
+        cout << "Goal found within depth limit." << endl;
+    } else {
+        cout << "Goal not found within depth limit." << endl;
+    }
+
+    // Cleanup: Free allocated memory (not necessary in all cases)
+    // TODO: Implement a proper destructor to handle cleanup
+    delete root->children[0]->children[0];
+    delete root->children[0]->children[1];
+    delete root->children[1]->children[0];
+    delete root->children[0];
+    delete root->children[1];
+    delete root;
+
+    return 0;
+}
